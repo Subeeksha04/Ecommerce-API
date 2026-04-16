@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq;
 using Microsoft.Extensions.Configuration;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.EntityFrameworkCore;
@@ -42,7 +43,7 @@ namespace Ecommerce_API.Services
                 Id = Guid.NewGuid(),
                 UserName = userName,
                 Email = email,
-                Role = role,
+                RoleType = role,
                 CreatedDate = DateTime.UtcNow,
                 IsActive = true,
                 PhoneNumber = null,
@@ -58,7 +59,7 @@ namespace Ecommerce_API.Services
 
             // Optionally update role field (application-specific)
             user = await _userManager.FindByIdAsync(user.Id.ToString()) ?? user;
-            user.Role = role;
+            user.RoleType = role;
             await _userManager.UpdateAsync(user);
 
             return GenerateJwtToken(user);
@@ -107,8 +108,8 @@ namespace Ecommerce_API.Services
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName ?? string.Empty),
-                new Claim(ClaimTypes.Role, user.Role.ToString()),
-                new Claim("role", user.Role.ToString())
+                new Claim(ClaimTypes.Role, user.RoleType.ToString()),
+                new Claim("role", user.RoleType.ToString())
             };
 
             var token = new JwtSecurityToken(
